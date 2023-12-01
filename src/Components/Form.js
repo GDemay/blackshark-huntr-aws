@@ -68,7 +68,7 @@ const Form = () => {
     if (!email.trim()) errors.email = 'Email is required';
     if (!companyName.trim()) errors.companyName = 'Company name is required';
     if (!companyAddress.trim()) errors.companyAddress = 'Company address is required';
-    if (numUsers <= 0) errors.numUsers = 'Number of users must be at least 1';
+    if (numUsers < 0) errors.numUsers = 'Number of users must be at least 0';
     if (additionalStorage <= 0) errors.additionalStorage = 'Additional storage must be selected';
     if (!termsAgreed) errors.termsAgreed = 'You must agree to the terms';
     setFormErrors(errors);
@@ -221,6 +221,7 @@ const Form = () => {
         <Grid item xs={12}>
           <TextField
             label="Name"
+            required
             fullWidth
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -232,6 +233,7 @@ const Form = () => {
             label="Email"
             fullWidth
             type="email"
+            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -242,6 +244,7 @@ const Form = () => {
             label="Company Name"
             fullWidth
             value={companyName}
+            required
             onChange={(e) => setCompanyName(e.target.value)}
           />
         </Grid>
