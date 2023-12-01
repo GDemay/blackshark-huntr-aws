@@ -112,7 +112,7 @@ const Form = () => {
     const templateParamsToCustomer = {
       to_email: email,
       subject: "Your Subscription Order Confirmation",
-      message: `Dear ${name},\nThank you for your subscription order. Here are the details of your order:\n${emailContent}`,
+      message: emailContent,
       to_name: name,
       from_name: 'Blackshark.ai', // Replace with your company's name
     };
