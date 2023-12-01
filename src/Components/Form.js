@@ -25,7 +25,7 @@ import emailjs from 'emailjs-com';
 const Form = () => {
   
   const [subscriptionDuration, setSubscriptionDuration] = useState('1-month');
-  const [numUsers, setNumUsers] = useState(1);
+  const [numUsers, setNumUsers] = useState(0);
   const [additionalStorage, setAdditionalStorage] = useState(100);
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [name, setName] = useState('');
@@ -173,11 +173,11 @@ const Form = () => {
         value={numUsers}
         onChange={(e) => {
             // Ensure the value is between 1 and 50
-            const newValue = Math.min(Math.max(parseInt(e.target.value, 10), 1), 50);
+            const newValue = Math.min(Math.max(parseInt(e.target.value, 10), 0), 50);
             setNumUsers(newValue);
         }}
         inputProps={{
-            min: 1,
+            min: 0,
             max: 50,  // Update this value to 50
         }}
     />
