@@ -40,11 +40,13 @@ const Form = () => {
 
   const alwaysOnGPU = true;
   const totalPriceFor10UsersPerYear = 1296000;
-  const storageOptions = { 100: 200, 200: 400, 300: 600 };
+  const storageOptions = { 100: 200, 200: 400, 300: 600, 400: 800, 500: 1000, 600: 1200, 700: 1400, 800: 1600, 900: 1800, 1000: 2000 };
   const basePrices = { "1-month": 15000, "3-months": 45000, "6-months": 90000, "1-year": 162000 };
   const gpuCost = { "1-month": 5000, "3-months": 15000, "6-months": 30000, "1-year": 54000 };
   const subscriptionDurationMonths = { "1-month": 1, "3-months": 3, "6-months": 6, "1-year": 12 };
   const pricePerUser = { "1-month": 120000, "3-months": 360000, "6-months": 720000, "1-year": 1296000 };
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
+
 
   
   const navigate = useNavigate();
@@ -86,32 +88,56 @@ const Form = () => {
 
 
   const sendEmail = () => {
+    setIsLoading(true); // Start loading when email sending process begins
+  
     const emailContent = `Subscription Duration: ${subscriptionDuration}, ` +
-    `Number of Users: ${numUsers}, ` +
-    `Additional Storage: ${additionalStorage} GB, ` +
-    `Always-On GPU: ${alwaysOnGPU ? "Yes" : "No"}, ` +
-    `Additional Information: ${additionalInformation}, ` +
-    `Total Price: $${totalPrice.toLocaleString()}, ` +
-    `Name: ${name}, ` +
-    `Email: ${email}, ` +
-    `Company Name: ${companyName}, ` +
-    `Company Address: ${companyAddress}, `;
-    const templateParams = {
-      to_email: email,
+      `Number of Users: ${numUsers}, ` +
+      `Additional Storage: ${additionalStorage} GB, ` +
+      `Always-On GPU: ${alwaysOnGPU ? "Yes" : "No"}, ` +
+      `Additional Information: ${additionalInformation}, ` +
+      `Total Price: $${totalPrice.toLocaleString()}, ` +
+      `Name: ${name}, ` +
+      `Email: ${email}, ` +
+      `Company Name: ${companyName}, ` +
+      `Company Address: ${companyAddress}, `;
+  
+    const templateParamsToCompany = {
+      to_email: 'no-reply@blackshark.ai', // Replace with your company email
       subject: "New Subscription Order",
       message: emailContent,
+      to_name: 'Blackshark.ai', // Replace with your company's name
+      from_name: name,
     };
-
-    emailjs.send('service_nqwg6zm', 'template_9l9lkns', templateParams, 'EWuMjZX2o9kN1Bdmh')
-    .then(response => {
-      console.log('Email successfully sent!', response.status, response.text);
-      setEmailStatus('Email sent successfully');
-      navigate('/success'); // Navigate to the success page
-    }, err => {
-      console.error('Failed to send email. Error: ', err);
-      setEmailStatus('Failed to send email');
-    });
+  
+    const templateParamsToCustomer = {
+      to_email: email,
+      subject: "Your Subscription Order Confirmation",
+      message: `Dear ${name},\nThank you for your subscription order. Here are the details of your order:\n${emailContent}`,
+      to_name: name,
+      from_name: 'Blackshark.ai', // Replace with your company's name
+    };
+  
+    // Send email to the company
+    emailjs.send('service_nqwg6zm', 'template_9l9lkns', templateParamsToCompany, 'EWuMjZX2o9kN1Bdmh')
+      .then(response => {
+        console.log('Email to company successfully sent!', response.status, response.text);
+        setEmailStatus('Email sent successfully');
+        // Send email to the customer
+        return emailjs.send('service_nqwg6zm', 'template_5ijzfcx', templateParamsToCustomer, 'EWuMjZX2o9kN1Bdmh');
+      })
+      .then(response => {
+        console.log('Email to customer successfully sent!', response.status, response.text);
+        navigate('/success'); // Navigate to the success page
+      })
+      .catch(err => {
+        console.error('Failed to send email. Error: ', err);
+        setEmailStatus('Failed to send email');
+      })
+      .finally(() => {
+        setIsLoading(false); // Stop loading regardless of email success or failure
+      });
   };
+  
 
   const handleProceed = () => {
     sendEmail();
@@ -140,22 +166,23 @@ const Form = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <TextField
-            label="Number of Users"
-            fullWidth
-            type="number"
-            value={numUsers}
-            onChange={(e) => {
-              // Ensure the value is between 1 and 10
-              const newValue = Math.min(Math.max(parseInt(e.target.value, 10), 1), 10);
-              setNumUsers(newValue);
-            }}
-            inputProps={{
-              min: 1,
-              max: 10,
-            }}
-          />
-        </Grid>
+    <TextField
+        label="Number of Users"
+        fullWidth
+        type="number"
+        value={numUsers}
+        onChange={(e) => {
+            // Ensure the value is between 1 and 50
+            const newValue = Math.min(Math.max(parseInt(e.target.value, 10), 1), 50);
+            setNumUsers(newValue);
+        }}
+        inputProps={{
+            min: 1,
+            max: 50,  // Update this value to 50
+        }}
+    />
+</Grid>
+
 
         <Grid item xs={12}>
           <FormControl fullWidth>
@@ -306,8 +333,13 @@ const Form = () => {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleProceed} color="primary" autoFocus>
-            Proceed
+          <Button 
+            onClick={handleProceed} 
+            color="primary" 
+            autoFocus
+            disabled={isLoading} // Disable button when loading
+          >
+            {isLoading ? 'Processing...' : 'Proceed'} {/* Change text based on loading state */}
           </Button>
         </DialogActions>
       </Dialog>
