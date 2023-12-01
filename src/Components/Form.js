@@ -89,7 +89,7 @@ const Form = () => {
 
   const sendEmail = () => {
     setIsLoading(true); // Start loading when email sending process begins
-  
+
     const emailContent = `Subscription Duration: ${subscriptionDuration}, ` +
       `Number of Users: ${numUsers}, ` +
       `Additional Storage: ${additionalStorage} GB, ` +
@@ -99,34 +99,20 @@ const Form = () => {
       `Name: ${name}, ` +
       `Email: ${email}, ` +
       `Company Name: ${companyName}, ` +
-      `Company Address: ${companyAddress}, `;
-  
-    const templateParamsToCompany = {
-      to_email: 'no-reply@blackshark.ai', // Replace with your company email
+      `Company Address: ${companyAddress}`;
+
+    const templateParams = {
+      to_email: 'no-reply@blackshark.ai', // Replace with your internal company email
       subject: "New Subscription Order",
       message: emailContent,
-      to_name: 'Blackshark.ai', // Replace with your company's name
+      to_name: 'Blackshark.ai Team',
       from_name: name,
     };
-  
-    const templateParamsToCustomer = {
-      to_email: email,
-      subject: "Your Subscription Order Confirmation",
-      message: emailContent,
-      to_name: name,
-      from_name: 'Blackshark.ai', // Replace with your company's name
-    };
-  
-    // Send email to the company
-    emailjs.send('service_nqwg6zm', 'template_9l9lkns', templateParamsToCompany, 'EWuMjZX2o9kN1Bdmh')
+
+    emailjs.send('service_nqwg6zm', 'template_9l9lkns', templateParams, 'EWuMjZX2o9kN1Bdmh')
       .then(response => {
-        console.log('Email to company successfully sent!', response.status, response.text);
+        console.log('Email successfully sent!', response.status, response.text);
         setEmailStatus('Email sent successfully');
-        // Send email to the customer
-        return emailjs.send('service_nqwg6zm', 'template_5ijzfcx', templateParamsToCustomer, 'EWuMjZX2o9kN1Bdmh');
-      })
-      .then(response => {
-        console.log('Email to customer successfully sent!', response.status, response.text);
         navigate('/success'); // Navigate to the success page
       })
       .catch(err => {
